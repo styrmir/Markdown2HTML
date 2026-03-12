@@ -1,0 +1,11 @@
+bin/
+obj/
+nupkg/
+.tool-test/
+
+.vs/
+.vscode/
+
+*.user
+*.suo
+*.cache
