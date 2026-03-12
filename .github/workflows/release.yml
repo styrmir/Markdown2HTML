@@ -67,12 +67,18 @@ jobs:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     needs: build
+    if: always()
 
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-assets
+
+      - name: Show Downloaded Assets
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path ./release-assets -Recurse | Select-Object FullName
 
       - name: Publish Release Assets
         uses: softprops/action-gh-release@v2
