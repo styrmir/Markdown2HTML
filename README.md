@@ -1,6 +1,6 @@
-# Markdown2Html
+# md2html
 
-Markdown2Html is a .NET 10 command-line app that converts a supported subset of Markdown into a full HTML document.
+md2html is a .NET 10 command-line app that converts a supported subset of Markdown into a full HTML document.
 
 The project currently includes:
 
@@ -9,7 +9,7 @@ The project currently includes:
 - a custom markdown parser and HTML renderer
 - HTML document generation with basic built-in styling
 - company branding in help output and generated HTML documents
-- packaging as a .NET tool with the command name `markdown2html`
+- packaging as a .NET tool with the command name `md2html`
 - automated tests for CLI behavior and rendering output
 
 ## Company Information
@@ -19,8 +19,8 @@ The project currently includes:
 
 This information is shown in two places:
 
-- in the command help output shown by `markdown2html --help`
-- at the top of generated HTML documents
+- in the command help output shown by `md2html --help`
+- at the bottom of generated HTML documents
 
 ## Usage
 
@@ -34,10 +34,10 @@ Get-Content README.md | dotnet run --
 You can also use the packaged tool command after installation:
 
 ```powershell
-markdown2html README.md
-markdown2html --input README.md --output README.html
-markdown2html README.md --open
-Get-Content README.md | markdown2html
+md2html README.md
+md2html --input README.md --output README.html
+md2html README.md --open
+Get-Content README.md | md2html
 ```
 
 ## Command Line Options
@@ -56,13 +56,15 @@ Default behavior:
 Example:
 
 ```powershell
-markdown2html README.md --open
+md2html README.md --open
 ```
 
 If the app is run without parameters and without piped stdin, it shows:
 
 - the app name
+- the git-derived app version
 - the company information
+- the GitHub downloads page
 - the message `No input was provided. Use --input <file> or pipe markdown through stdin.`
 - the normal help text
 
@@ -70,23 +72,30 @@ If the app is run without parameters and without piped stdin, it shows:
 
 ```powershell
 dotnet pack
-dotnet tool install --global --add-source .\nupkg Markdown2Html
-markdown2html --help
+dotnet tool install --global --add-source .\nupkg md2html
+md2html --help
 ```
 
 For a local, repo-scoped install during development:
 
 ```powershell
 dotnet pack
-dotnet tool install --tool-path .\.tool-test --add-source .\nupkg Markdown2Html --version 1.0.1
-.\.tool-test\markdown2html --help
+dotnet tool install --tool-path .\.tool-test --add-source .\nupkg md2html --version <published-version>
+.\.tool-test\md2html --help
 ```
+
+The version is derived automatically from git tags and commit history.
+
+- a tagged commit like `v1.0.2` produces version `1.0.2`
+- commits after a tag get an automatically incremented prerelease version
 
 ## Releases
 
 Prebuilt standalone binaries are available from the GitHub Releases page:
 
 - https://github.com/styrmir/Markdown2HTML/releases
+
+This same downloads page is also shown in the CLI help output.
 
 Each release can include platform-specific zip files such as:
 
@@ -105,6 +114,8 @@ One-off example for Windows x64:
 ```powershell
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishAot=true -p:PublishSingleFile=true -o .\publish\win-x64
 ```
+
+This produces `md2html.exe` on Windows and `md2html` on Linux or macOS.
 
 One-off example for Linux x64:
 
@@ -153,7 +164,7 @@ Notes:
 
 ### Automated GitHub Releases
 
-The repository includes a GitHub Actions workflow that builds binaries on every push to `main` and publishes release binaries when a version tag such as `v1.0.1` is pushed.
+The repository includes a GitHub Actions workflow that builds binaries on every push to `main` and publishes release binaries when a version tag such as `v1.0.2` is pushed.
 
 Workflow behavior:
 
@@ -225,7 +236,7 @@ The app generates a complete HTML document, not only a fragment. The markdown ab
 - Output is wrapped in a full HTML document with `<!doctype html>`, `<head>`, and `<body>`
 - The document title is derived from the input file name when a file path is provided
 - When reading from stdin, the default title is `Document`
-- The generated HTML includes a header at the top with the company name and website
+- The generated HTML includes a small footer at the bottom with the company name and website
 - Plain text and code content are HTML-escaped
 - Unsafe `javascript:` links are rewritten to `#`
 

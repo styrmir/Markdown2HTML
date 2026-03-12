@@ -71,7 +71,9 @@ public static class CommandLineParser
 
     public static string GetHelpText(bool colorize = false)
     {
-        var appName = colorize ? AnsiConsoleStyler.Heading("Markdown2Html") : "Markdown2Html";
+        var appName = colorize ? AnsiConsoleStyler.Heading("md2html") : "md2html";
+        var versionLine = colorize ? AnsiConsoleStyler.Subtle($"Version {AppInfo.Version}") : $"Version {AppInfo.Version}";
+        var downloadsLine = colorize ? AnsiConsoleStyler.Subtle($"Downloads {AppInfo.DownloadsPage}") : $"Downloads {AppInfo.DownloadsPage}";
         var usageHeading = colorize ? AnsiConsoleStyler.Section("Usage:") : "Usage:";
         var optionsHeading = colorize ? AnsiConsoleStyler.Section("Options:") : "Options:";
         var examplesHeading = colorize ? AnsiConsoleStyler.Section("Examples:") : "Examples:";
@@ -81,36 +83,38 @@ public static class CommandLineParser
         var websiteLine = colorize ? AnsiConsoleStyler.Subtle(AppInfo.CompanyWebsite) : AppInfo.CompanyWebsite;
 
         var usageFile = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html README.md")
-            : "  markdown2html README.md";
+            ? AnsiConsoleStyler.Example("  md2html README.md")
+            : "  md2html README.md";
         var usageStdout = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html README.md > README.html")
-            : "  markdown2html README.md > README.html";
+            ? AnsiConsoleStyler.Example("  md2html README.md > README.html")
+            : "  md2html README.md > README.html";
         var usagePipe = colorize
-            ? AnsiConsoleStyler.Example("  type README.md | markdown2html")
-            : "  type README.md | markdown2html";
+            ? AnsiConsoleStyler.Example("  type README.md | md2html")
+            : "  type README.md | md2html";
         var usageExplicit = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html --input README.md --output README.html")
-            : "  markdown2html --input README.md --output README.html";
+            ? AnsiConsoleStyler.Example("  md2html --input README.md --output README.html")
+            : "  md2html --input README.md --output README.html";
 
         var exampleOpen = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html README.md --open")
-            : "  markdown2html README.md --open";
+            ? AnsiConsoleStyler.Example("  md2html README.md --open")
+            : "  md2html README.md --open";
         var examplePipe = colorize
-            ? AnsiConsoleStyler.Example("  Get-Content notes.md | markdown2html > notes.html")
-            : "  Get-Content notes.md | markdown2html > notes.html";
+            ? AnsiConsoleStyler.Example("  Get-Content notes.md | md2html > notes.html")
+            : "  Get-Content notes.md | md2html > notes.html";
         var examplePositional = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html .\\test-md-files\\OutlookISyslu_UMBRA_Briefing.md")
-            : "  markdown2html .\\test-md-files\\OutlookISyslu_UMBRA_Briefing.md";
+            ? AnsiConsoleStyler.Example("  md2html .\\docs\\sample.md")
+            : "  md2html .\\docs\\sample.md";
         var exampleExplicit = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html --input README.md --output C:\\temp\\README.html")
-            : "  markdown2html --input README.md --output C:\\temp\\README.html";
+            ? AnsiConsoleStyler.Example("  md2html --input README.md --output C:\\temp\\README.html")
+            : "  md2html --input README.md --output C:\\temp\\README.html";
 
         return
             $"{appName}{Environment.NewLine}{Environment.NewLine}" +
+            $"{versionLine}{Environment.NewLine}{Environment.NewLine}" +
             $"Convert markdown from a file or stdin into a full HTML document.{Environment.NewLine}{Environment.NewLine}" +
             $"{companyLine}{Environment.NewLine}" +
-            $"{websiteLine}{Environment.NewLine}{Environment.NewLine}" +
+            $"{websiteLine}{Environment.NewLine}" +
+            $"{downloadsLine}{Environment.NewLine}{Environment.NewLine}" +
             $"{usageHeading}{Environment.NewLine}" +
             $"{usageFile}{Environment.NewLine}" +
                 $"{usageExplicit}{Environment.NewLine}" +

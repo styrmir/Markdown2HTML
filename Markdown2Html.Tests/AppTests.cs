@@ -8,7 +8,7 @@ public sealed class AppTests
     [Fact]
     public async Task RunAsync_ConvertsFileInputToHtmlDocument()
     {
-        var tempFile = Path.Combine(Path.GetTempPath(), $"markdown2html-{Guid.NewGuid():N}.md");
+        var tempFile = Path.Combine(Path.GetTempPath(), $"md2html-{Guid.NewGuid():N}.md");
         var outputFile = Path.ChangeExtension(tempFile, ".html");
         await File.WriteAllTextAsync(tempFile, "# Sample Title\n\nParagraph with **bold** text.");
 
@@ -29,14 +29,14 @@ public sealed class AppTests
             Assert.Equal(string.Empty, standardOutput.ToString());
             var html = await File.ReadAllTextAsync(outputFile);
             Assert.Contains("<!doctype html>", html);
-            Assert.Contains("<title>markdown2html-", html, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("<title>md2html-", html, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("<h1>Sample Title</h1>", html);
             Assert.Contains("<p>Paragraph with <strong>bold</strong> text.</p>", html);
             Assert.Contains(AppInfo.CompanyName, html);
             Assert.Contains(AppInfo.CompanyWebsite, html);
             Assert.True(
                 html.IndexOf(AppInfo.CompanyName, StringComparison.Ordinal)
-                < html.IndexOf("<main>", StringComparison.Ordinal));
+                > html.IndexOf("</main>", StringComparison.Ordinal));
         }
         finally
         {
@@ -70,8 +70,8 @@ public sealed class AppTests
     [Fact]
     public async Task RunAsync_WithOpenAndOutput_InvokesOpenAction()
     {
-        var inputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-input-{Guid.NewGuid():N}.md");
-        var outputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-output-{Guid.NewGuid():N}.html");
+        var inputFile = Path.Combine(Path.GetTempPath(), $"md2html-input-{Guid.NewGuid():N}.md");
+        var outputFile = Path.Combine(Path.GetTempPath(), $"md2html-output-{Guid.NewGuid():N}.html");
         string? openedPath = null;
 
         await File.WriteAllTextAsync(inputFile, "# Open Test");
@@ -111,7 +111,7 @@ public sealed class AppTests
     [Fact]
     public async Task RunAsync_WithPositionalInput_WritesSiblingHtmlByDefault()
     {
-        var inputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-positional-{Guid.NewGuid():N}.md");
+        var inputFile = Path.Combine(Path.GetTempPath(), $"md2html-positional-{Guid.NewGuid():N}.md");
         var outputFile = Path.ChangeExtension(inputFile, ".html");
 
         await File.WriteAllTextAsync(inputFile, "# Positional Test");
@@ -179,6 +179,8 @@ public sealed class AppTests
         Assert.Equal(string.Empty, standardError.ToString());
         Assert.Contains(AppInfo.CompanyName, standardOutput.ToString());
         Assert.Contains(AppInfo.CompanyWebsite, standardOutput.ToString());
+        Assert.Contains($"Version {AppInfo.Version}", standardOutput.ToString());
+        Assert.Contains(AppInfo.DownloadsPage, standardOutput.ToString());
     }
 
     [Fact]
@@ -197,9 +199,11 @@ public sealed class AppTests
         Assert.Equal(1, exitCode);
         Assert.Equal(string.Empty, standardOutput.ToString());
         Assert.Contains("No input was provided. Use --input <file> or pipe markdown through stdin.", standardError.ToString());
-        Assert.Contains("Markdown2Html", standardError.ToString());
+        Assert.Contains("md2html", standardError.ToString());
+        Assert.Contains($"Version {AppInfo.Version}", standardError.ToString());
         Assert.Contains(AppInfo.CompanyName, standardError.ToString());
         Assert.Contains(AppInfo.CompanyWebsite, standardError.ToString());
+        Assert.Contains(AppInfo.DownloadsPage, standardError.ToString());
     }
 
     [Fact]
@@ -218,13 +222,13 @@ public sealed class AppTests
         Assert.Equal(1, exitCode);
         Assert.Equal(string.Empty, standardOutput.ToString());
         Assert.Contains("The --open option requires a file-based output. Use an input file or specify --output <file>.", standardError.ToString());
-        Assert.Contains("Markdown2Html", standardError.ToString());
+        Assert.Contains("md2html", standardError.ToString());
     }
 
     [Fact]
     public async Task RunAsync_WithOpenAndPositionalInput_OpensDerivedOutputFile()
     {
-        var inputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-open-{Guid.NewGuid():N}.md");
+        var inputFile = Path.Combine(Path.GetTempPath(), $"md2html-open-{Guid.NewGuid():N}.md");
         var outputFile = Path.ChangeExtension(inputFile, ".html");
         string? openedPath = null;
 

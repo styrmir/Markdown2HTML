@@ -5,16 +5,22 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>md2html</AssemblyName>
+    <TargetName>md2html</TargetName>
     <IsAotCompatible>true</IsAotCompatible>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>markdown2html</ToolCommandName>
-    <PackageId>Markdown2Html</PackageId>
-    <Version>1.0.1</Version>
+    <ToolCommandName>md2html</ToolCommandName>
+    <PackageId>md2html</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageOutputPath>nupkg</PackageOutputPath>
     <Description>Command-line Markdown to HTML converter built with .NET 10.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="All" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Markdown2Html.Tests\**\*.cs" />

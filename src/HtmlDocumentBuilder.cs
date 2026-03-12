@@ -28,20 +28,20 @@ public static class HtmlDocumentBuilder
         builder.AppendLine("    th, td { border: 1px solid #d0d7de; padding: 0.6rem 0.75rem; vertical-align: top; }");
         builder.AppendLine("    th { background: #f6f8fa; } ");
         builder.AppendLine("    input[type=checkbox] { margin-right: 0.45rem; }");
-        builder.AppendLine("    header { border-bottom: 1px solid #d0d7de; margin-bottom: 2rem; padding-bottom: 1rem; }");
-        builder.AppendLine("    .app-meta { color: #57606a; font-size: 0.95rem; margin: 0; }");
+        builder.AppendLine("    footer { border-top: 1px solid #d0d7de; color: #6e7781; font-size: 0.8rem; margin-top: 2rem; padding-top: 0.85rem; } ");
+        builder.AppendLine("    .app-meta { margin: 0; } ");
         builder.AppendLine("    a { color: #0969da; }");
         builder.AppendLine("  </style>");
         builder.AppendLine("</head>");
         builder.AppendLine("<body>");
-        builder.Append("  <header><p class=\"app-meta\">Generated with Markdown2Html by ")
-            .Append(encodedCompanyName)
-            .Append(" · <a href=\"")
-            .Append(encodedCompanyWebsite)
-            .AppendLine("\">abra.is</a></p></header>");
         builder.AppendLine("  <main>");
         builder.AppendLine(Indent(htmlFragment, "    "));
         builder.AppendLine("  </main>");
+        builder.Append("  <footer><p class=\"app-meta\">Generated with md2html by ")
+            .Append(encodedCompanyName)
+            .Append(" · <a href=\"")
+            .Append(encodedCompanyWebsite)
+            .AppendLine("\">abra.is</a></p></footer>");
         builder.AppendLine("</body>");
         builder.AppendLine("</html>");
 
