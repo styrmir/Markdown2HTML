@@ -153,7 +153,7 @@ Notes:
 
 ### Automated GitHub Releases
 
-The repository includes a GitHub Actions workflow that builds release binaries and attaches them to GitHub Releases when a version tag such as `v1.0.1` is pushed.
+The repository includes a GitHub Actions workflow that builds binaries on every push to `main` and publishes release binaries when a version tag such as `v1.0.1` is pushed.
 
 Workflow behavior:
 
@@ -162,7 +162,12 @@ Workflow behavior:
 - macOS Intel runner builds `osx-x64`
 - macOS Apple Silicon runner builds `osx-arm64`
 
-This makes the binaries directly downloadable from the Releases page without building locally.
+Behavior by event:
+
+- push to `main`: binaries are produced as GitHub Actions workflow artifacts
+- push of a `v*` tag: binaries are attached to the GitHub Release page
+
+This makes the binaries available either as workflow artifacts for normal pushes or as release downloads for tagged versions.
 
 ## Supported Markdown
 
