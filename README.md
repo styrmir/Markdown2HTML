@@ -25,32 +25,38 @@ This information is shown in two places:
 ## Usage
 
 ```powershell
+dotnet run -- README.md
 dotnet run -- --input README.md --output README.html
-dotnet run -- README.md > README.html
+dotnet run -- README.md --open
 Get-Content README.md | dotnet run --
 ```
 
 You can also use the packaged tool command after installation:
 
 ```powershell
+markdown2html README.md
 markdown2html --input README.md --output README.html
-markdown2html README.md > README.html
+markdown2html README.md --open
 Get-Content README.md | markdown2html
 ```
 
 ## Command Line Options
 
 - `-i`, `--input <file>`: read markdown from a file
-- `-o`, `--output <file>`: write HTML to a file instead of stdout
+- `-o`, `--output <file>`: write HTML to a specific file
 - `--open`: open the generated HTML file after conversion completes
 - `-h`, `--help`: show help text
 
-`--open` is intended for file output and should be used together with `--output`.
+Default behavior:
+
+- if the first argument is a file path, it is used as the input file
+- if a file input is used and `--output` is omitted, the app writes a sibling `.html` file automatically
+- if stdin is used and `--output` is omitted, the app writes to stdout
 
 Example:
 
 ```powershell
-markdown2html --input README.md --output README.html --open
+markdown2html README.md --open
 ```
 
 If the app is run without parameters and without piped stdin, it shows:

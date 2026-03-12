@@ -9,6 +9,7 @@ public sealed class AppTests
     public async Task RunAsync_ConvertsFileInputToHtmlDocument()
     {
         var tempFile = Path.Combine(Path.GetTempPath(), $"markdown2html-{Guid.NewGuid():N}.md");
+        var outputFile = Path.ChangeExtension(tempFile, ".html");
         await File.WriteAllTextAsync(tempFile, "# Sample Title\n\nParagraph with **bold** text.");
 
         try
@@ -25,19 +26,25 @@ public sealed class AppTests
 
             Assert.Equal(0, exitCode);
             Assert.Equal(string.Empty, standardError.ToString());
-            Assert.Contains("<!doctype html>", standardOutput.ToString());
-            Assert.Contains("<title>markdown2html-", standardOutput.ToString(), StringComparison.OrdinalIgnoreCase);
-            Assert.Contains("<h1>Sample Title</h1>", standardOutput.ToString());
-            Assert.Contains("<p>Paragraph with <strong>bold</strong> text.</p>", standardOutput.ToString());
-            Assert.Contains(AppInfo.CompanyName, standardOutput.ToString());
-            Assert.Contains(AppInfo.CompanyWebsite, standardOutput.ToString());
+            Assert.Equal(string.Empty, standardOutput.ToString());
+            var html = await File.ReadAllTextAsync(outputFile);
+            Assert.Contains("<!doctype html>", html);
+            Assert.Contains("<title>markdown2html-", html, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("<h1>Sample Title</h1>", html);
+            Assert.Contains("<p>Paragraph with <strong>bold</strong> text.</p>", html);
+            Assert.Contains(AppInfo.CompanyName, html);
+            Assert.Contains(AppInfo.CompanyWebsite, html);
             Assert.True(
-                standardOutput.ToString().IndexOf(AppInfo.CompanyName, StringComparison.Ordinal)
-                < standardOutput.ToString().IndexOf("<main>", StringComparison.Ordinal));
+                html.IndexOf(AppInfo.CompanyName, StringComparison.Ordinal)
+                < html.IndexOf("<main>", StringComparison.Ordinal));
         }
         finally
         {
             File.Delete(tempFile);
+            if (File.Exists(outputFile))
+            {
+                File.Delete(outputFile);
+            }
         }
     }
 
@@ -86,6 +93,41 @@ public sealed class AppTests
             Assert.Equal(0, exitCode);
             Assert.Equal(outputFile, openedPath);
             Assert.True(File.Exists(outputFile));
+        }
+        finally
+        {
+            if (File.Exists(inputFile))
+            {
+                File.Delete(inputFile);
+            }
+
+            if (File.Exists(outputFile))
+            {
+                File.Delete(outputFile);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task RunAsync_WithPositionalInput_WritesSiblingHtmlByDefault()
+    {
+        var inputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-positional-{Guid.NewGuid():N}.md");
+        var outputFile = Path.ChangeExtension(inputFile, ".html");
+
+        await File.WriteAllTextAsync(inputFile, "# Positional Test");
+
+        try
+        {
+            var exitCode = await App.RunAsync(
+                [inputFile],
+                new StringReader(string.Empty),
+                new StringWriter(),
+                new StringWriter(),
+                isInputRedirected: false);
+
+            Assert.Equal(0, exitCode);
+            Assert.True(File.Exists(outputFile));
+            Assert.Contains("<h1>Positional Test</h1>", await File.ReadAllTextAsync(outputFile));
         }
         finally
         {
@@ -175,8 +217,49 @@ public sealed class AppTests
 
         Assert.Equal(1, exitCode);
         Assert.Equal(string.Empty, standardOutput.ToString());
-        Assert.Contains("The --open option requires --output <file>.", standardError.ToString());
+        Assert.Contains("The --open option requires a file-based output. Use an input file or specify --output <file>.", standardError.ToString());
         Assert.Contains("Markdown2Html", standardError.ToString());
+    }
+
+    [Fact]
+    public async Task RunAsync_WithOpenAndPositionalInput_OpensDerivedOutputFile()
+    {
+        var inputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-open-{Guid.NewGuid():N}.md");
+        var outputFile = Path.ChangeExtension(inputFile, ".html");
+        string? openedPath = null;
+
+        await File.WriteAllTextAsync(inputFile, "# Open Derived Test");
+
+        try
+        {
+            var exitCode = await App.RunAsync(
+                [inputFile, "--open"],
+                new StringReader(string.Empty),
+                new StringWriter(),
+                new StringWriter(),
+                isInputRedirected: false,
+                openOutputAction: path =>
+                {
+                    openedPath = path;
+                    return Task.CompletedTask;
+                });
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(outputFile, openedPath);
+            Assert.True(File.Exists(outputFile));
+        }
+        finally
+        {
+            if (File.Exists(inputFile))
+            {
+                File.Delete(inputFile);
+            }
+
+            if (File.Exists(outputFile))
+            {
+                File.Delete(outputFile);
+            }
+        }
     }
 
     [Fact]

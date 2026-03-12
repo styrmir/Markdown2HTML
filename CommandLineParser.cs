@@ -81,24 +81,30 @@ public static class CommandLineParser
         var websiteLine = colorize ? AnsiConsoleStyler.Subtle(AppInfo.CompanyWebsite) : AppInfo.CompanyWebsite;
 
         var usageFile = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html --input README.md --output README.html")
-            : "  markdown2html --input README.md --output README.html";
+            ? AnsiConsoleStyler.Example("  markdown2html README.md")
+            : "  markdown2html README.md";
         var usageStdout = colorize
             ? AnsiConsoleStyler.Example("  markdown2html README.md > README.html")
             : "  markdown2html README.md > README.html";
         var usagePipe = colorize
             ? AnsiConsoleStyler.Example("  type README.md | markdown2html")
             : "  type README.md | markdown2html";
+        var usageExplicit = colorize
+            ? AnsiConsoleStyler.Example("  markdown2html --input README.md --output README.html")
+            : "  markdown2html --input README.md --output README.html";
 
         var exampleOpen = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html --input README.md --output README.html --open")
-            : "  markdown2html --input README.md --output README.html --open";
+            ? AnsiConsoleStyler.Example("  markdown2html README.md --open")
+            : "  markdown2html README.md --open";
         var examplePipe = colorize
             ? AnsiConsoleStyler.Example("  Get-Content notes.md | markdown2html > notes.html")
             : "  Get-Content notes.md | markdown2html > notes.html";
         var examplePositional = colorize
-            ? AnsiConsoleStyler.Example("  markdown2html .\\test-md-files\\OutlookISyslu_UMBRA_Briefing.md --output C:\\temp\\briefing.html")
-            : "  markdown2html .\\test-md-files\\OutlookISyslu_UMBRA_Briefing.md --output C:\\temp\\briefing.html";
+            ? AnsiConsoleStyler.Example("  markdown2html .\\test-md-files\\OutlookISyslu_UMBRA_Briefing.md")
+            : "  markdown2html .\\test-md-files\\OutlookISyslu_UMBRA_Briefing.md";
+        var exampleExplicit = colorize
+            ? AnsiConsoleStyler.Example("  markdown2html --input README.md --output C:\\temp\\README.html")
+            : "  markdown2html --input README.md --output C:\\temp\\README.html";
 
         return
             $"{appName}{Environment.NewLine}{Environment.NewLine}" +
@@ -107,17 +113,19 @@ public static class CommandLineParser
             $"{websiteLine}{Environment.NewLine}{Environment.NewLine}" +
             $"{usageHeading}{Environment.NewLine}" +
             $"{usageFile}{Environment.NewLine}" +
+                $"{usageExplicit}{Environment.NewLine}" +
             $"{usageStdout}{Environment.NewLine}" +
             $"{usagePipe}{Environment.NewLine}{Environment.NewLine}" +
             $"{optionsHeading}{Environment.NewLine}" +
-            $"  -i, --input <file>    Read markdown from a file.{Environment.NewLine}" +
-            $"  -o, --output <file>   Write HTML to a file. Defaults to stdout.{Environment.NewLine}" +
-            $"  -open, --open         Open the generated HTML file after conversion.{Environment.NewLine}" +
+                $"  -i, --input <file>    Read markdown from a file. The first positional argument also works.{Environment.NewLine}" +
+                $"  -o, --output <file>   Write HTML to a specific file. Defaults to <input>.html for file input.{Environment.NewLine}" +
+                $"  -open, --open         Open the generated HTML file after conversion.{Environment.NewLine}" +
             $"  -h, --help            Show this help text.{Environment.NewLine}{Environment.NewLine}" +
             $"{examplesHeading}{Environment.NewLine}" +
             $"{exampleOpen}{Environment.NewLine}" +
             $"{examplePipe}{Environment.NewLine}" +
-            $"{examplePositional}";
+                $"{examplePositional}{Environment.NewLine}" +
+                $"{exampleExplicit}";
     }
 
     private static bool TryReadValue(string[] args, ref int index, out string? value)

@@ -5,7 +5,7 @@ namespace Markdown2Html;
 public static class App
 {
     private const string NoInputMessage = "No input was provided. Use --input <file> or pipe markdown through stdin.";
-    private const string OpenRequiresOutputMessage = "The --open option requires --output <file>.";
+    private const string OpenRequiresOutputMessage = "The --open option requires a file-based output. Use an input file or specify --output <file>.";
 
     public static async Task<int> RunAsync(
         string[] args,
@@ -27,8 +27,9 @@ public static class App
         }
 
         var options = parseResult.Options!;
+        var effectiveOutputPath = ResolveOutputPath(options);
 
-        if (options.OpenWhenDone && string.IsNullOrWhiteSpace(options.OutputPath))
+        if (options.OpenWhenDone && string.IsNullOrWhiteSpace(effectiveOutputPath))
         {
             await standardError.WriteLineAsync(OpenRequiresOutputMessage);
             await standardError.WriteLineAsync();
@@ -50,17 +51,17 @@ public static class App
             var title = TitleResolver.Resolve(options.InputPath);
             var htmlDocument = HtmlDocumentBuilder.Build(title, htmlFragment);
 
-            if (string.IsNullOrWhiteSpace(options.OutputPath))
+            if (string.IsNullOrWhiteSpace(effectiveOutputPath))
             {
                 await standardOutput.WriteAsync(htmlDocument);
                 return 0;
             }
 
-            await File.WriteAllTextAsync(options.OutputPath, htmlDocument);
+            await File.WriteAllTextAsync(effectiveOutputPath, htmlDocument);
 
             if (options.OpenWhenDone)
             {
-                await (openOutputAction ?? OpenOutputFileAsync)(options.OutputPath);
+                await (openOutputAction ?? OpenOutputFileAsync)(effectiveOutputPath);
             }
 
             return 0;
@@ -102,6 +103,22 @@ public static class App
         }
 
         return await standardInput.ReadToEndAsync();
+    }
+
+    private static string? ResolveOutputPath(CliOptions options)
+    {
+        if (!string.IsNullOrWhiteSpace(options.OutputPath))
+        {
+            return options.OutputPath;
+        }
+
+        if (string.IsNullOrWhiteSpace(options.InputPath))
+        {
+            return null;
+        }
+
+        var fullInputPath = Path.GetFullPath(options.InputPath);
+        return Path.ChangeExtension(fullInputPath, ".html");
     }
 
     private static Task OpenOutputFileAsync(string outputPath)
