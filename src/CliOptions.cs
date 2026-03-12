@@ -8,5 +8,7 @@ public sealed class CliOptions
 
     public bool OpenWhenDone { get; init; }
 
+    public bool GitHubStyle { get; init; }
+
     public bool ShowHelp { get; init; }
 }

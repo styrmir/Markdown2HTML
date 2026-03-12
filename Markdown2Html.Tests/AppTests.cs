@@ -350,4 +350,38 @@ public sealed class AppTests
         Assert.Contains("<ul><li><input type=\"checkbox\" disabled checked> parent<ul><li>child</li></ul></li><li><input type=\"checkbox\" disabled> next</li></ul>", html);
         Assert.Contains("<table><thead><tr><th style=\"text-align:left\">Name</th><th style=\"text-align:right\">Score</th></tr></thead><tbody><tr><td style=\"text-align:left\">Build</td><td style=\"text-align:right\">10</td></tr><tr><td style=\"text-align:left\">Test</td><td style=\"text-align:right\">8</td></tr></tbody></table>", html);
     }
+
+    [Fact]
+    public void Render_GitHubStyle_AddsTaskListClasses()
+    {
+        const string markdown = """
+            - [x] done
+            - [ ] todo
+            """;
+
+        var document = MarkdownParser.Parse(markdown);
+        var html = HtmlRenderer.Render(document, gitHubStyle: true);
+
+        Assert.Contains("<ul class=\"contains-task-list\">", html);
+        Assert.Contains("<li class=\"task-list-item\">", html);
+    }
+
+    [Fact]
+    public async Task RunAsync_WithGitHubStyle_UsesGitHubTheme()
+    {
+        var standardOutput = new StringWriter(new StringBuilder());
+        var standardError = new StringWriter();
+
+        var exitCode = await App.RunAsync(
+            ["--github-style"],
+            new StringReader("# Hello"),
+            standardOutput,
+            standardError,
+            isInputRedirected: true);
+
+        Assert.Equal(0, exitCode);
+        var html = standardOutput.ToString();
+        Assert.Contains("border-bottom: 1px solid", html);
+        Assert.Contains("BlinkMacSystemFont", html);
+    }
 }

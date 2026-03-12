@@ -8,6 +8,7 @@ The project currently includes:
 - file output and stdout support
 - a custom markdown parser and HTML renderer
 - HTML document generation with basic built-in styling
+- optional GitHub-flavored light theme for HTML output
 - basic syntax highlighting for common fenced code block languages in generated HTML
 - company branding in help output and generated HTML documents
 - packaging as a .NET tool with the command name `md2html`
@@ -46,6 +47,7 @@ Get-Content README.md | md2html
 - `-i`, `--input <file>`: read markdown from a file
 - `-o`, `--output <file>`: write HTML to a specific file
 - `--open`: open the generated HTML file after conversion completes
+- `--github-style`: use GitHub-flavored light theme for HTML output
 - `-h`, `--help`: show help text
 
 Default behavior:
@@ -58,6 +60,13 @@ Example:
 
 ```powershell
 md2html README.md --open
+```
+
+To use the GitHub-flavored light theme instead of the default serif theme:
+
+```powershell
+md2html README.md --github-style
+md2html README.md --github-style --open
 ```
 
 If the app is run without parameters and without piped stdin, it shows:

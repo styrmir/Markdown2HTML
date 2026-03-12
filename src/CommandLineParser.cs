@@ -7,6 +7,7 @@ public static class CommandLineParser
         string? inputPath = null;
         string? outputPath = null;
         var openWhenDone = false;
+        var gitHubStyle = false;
 
         for (var index = 0; index < args.Length; index++)
         {
@@ -43,6 +44,10 @@ public static class CommandLineParser
                     openWhenDone = true;
                     break;
 
+                case "--github-style":
+                    gitHubStyle = true;
+                    break;
+
                 default:
                     if (arg.StartsWith("-", StringComparison.Ordinal))
                     {
@@ -65,6 +70,7 @@ public static class CommandLineParser
                 InputPath = inputPath,
                 OutputPath = outputPath,
                 OpenWhenDone = openWhenDone,
+                GitHubStyle = gitHubStyle,
                 ShowHelp = false
             });
     }
@@ -124,6 +130,7 @@ public static class CommandLineParser
                 $"  -i, --input <file>    Read markdown from a file. The first positional argument also works.{Environment.NewLine}" +
                 $"  -o, --output <file>   Write HTML to a specific file. Defaults to <input>.html for file input.{Environment.NewLine}" +
                 $"  -open, --open         Open the generated HTML file after conversion.{Environment.NewLine}" +
+            $"  --github-style        Use GitHub-flavored light theme for HTML output.{Environment.NewLine}" +
             $"  -h, --help            Show this help text.{Environment.NewLine}{Environment.NewLine}" +
             $"{examplesHeading}{Environment.NewLine}" +
             $"{exampleOpen}{Environment.NewLine}" +

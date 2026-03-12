@@ -47,9 +47,9 @@ public static class App
         {
             var markdown = await ReadMarkdownAsync(options, standardInput, isInputRedirected);
             var document = MarkdownParser.Parse(markdown);
-            var htmlFragment = HtmlRenderer.Render(document);
+            var htmlFragment = HtmlRenderer.Render(document, options.GitHubStyle);
             var title = TitleResolver.Resolve(options.InputPath);
-            var htmlDocument = HtmlDocumentBuilder.Build(title, htmlFragment);
+            var htmlDocument = HtmlDocumentBuilder.Build(title, htmlFragment, options.GitHubStyle);
 
             if (string.IsNullOrWhiteSpace(effectiveOutputPath))
             {

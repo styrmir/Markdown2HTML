@@ -5,7 +5,7 @@ namespace Markdown2Html;
 
 public static class HtmlDocumentBuilder
 {
-    public static string Build(string title, string htmlFragment)
+    public static string Build(string title, string htmlFragment, bool gitHubStyle = false)
     {
         var encodedTitle = HtmlEncoder.Default.Encode(title);
         var encodedCompanyName = HtmlEncoder.Default.Encode(AppInfo.CompanyName);
@@ -19,6 +19,38 @@ public static class HtmlDocumentBuilder
         builder.AppendLine("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
         builder.Append("  <title>").Append(encodedTitle).AppendLine("</title>");
         builder.AppendLine("  <style>");
+        AppendStyles(builder, gitHubStyle);
+        builder.AppendLine("  </style>");
+        builder.AppendLine("</head>");
+        builder.AppendLine("<body>");
+        builder.AppendLine("  <main>");
+        builder.AppendLine(Indent(htmlFragment, "    "));
+        builder.AppendLine("  </main>");
+        builder.Append("  <footer><p class=\"app-meta\">Generated with md2html by ")
+            .Append(encodedCompanyName)
+            .Append(" · <a href=\"")
+            .Append(encodedCompanyWebsite)
+            .AppendLine("\">abra.is</a></p></footer>");
+        builder.AppendLine("</body>");
+        builder.AppendLine("</html>");
+
+        return builder.ToString();
+    }
+
+    private static void AppendStyles(StringBuilder builder, bool gitHubStyle)
+    {
+        if (gitHubStyle)
+        {
+            AppendGitHubStyles(builder);
+        }
+        else
+        {
+            AppendDefaultStyles(builder);
+        }
+    }
+
+    private static void AppendDefaultStyles(StringBuilder builder)
+    {
         builder.AppendLine("    :root { color-scheme: light; }");
         builder.AppendLine("    body { font-family: Georgia, 'Times New Roman', serif; margin: 2rem auto; max-width: 72ch; line-height: 1.6; padding: 0 1rem; color: #1f2328; }");
         builder.AppendLine("    pre { background: #f6f8fa; border-radius: 8px; overflow-x: auto; padding: 1rem; }");
@@ -36,26 +68,58 @@ public static class HtmlDocumentBuilder
         builder.AppendLine("    blockquote { border-left: 4px solid #d0d7de; margin-left: 0; padding-left: 1rem; color: #57606a; }");
         builder.AppendLine("    table { border-collapse: collapse; margin: 1.5rem 0; width: 100%; }");
         builder.AppendLine("    th, td { border: 1px solid #d0d7de; padding: 0.6rem 0.75rem; vertical-align: top; }");
-        builder.AppendLine("    th { background: #f6f8fa; } ");
+        builder.AppendLine("    th { background: #f6f8fa; }");
         builder.AppendLine("    input[type=checkbox] { margin-right: 0.45rem; }");
-        builder.AppendLine("    footer { border-top: 1px solid #d0d7de; color: #6e7781; font-size: 0.8rem; margin-top: 2rem; padding-top: 0.85rem; } ");
-        builder.AppendLine("    .app-meta { margin: 0; } ");
+        builder.AppendLine("    footer { border-top: 1px solid #d0d7de; color: #6e7781; font-size: 0.8rem; margin-top: 2rem; padding-top: 0.85rem; }");
+        builder.AppendLine("    .app-meta { margin: 0; }");
         builder.AppendLine("    a { color: #0969da; }");
-        builder.AppendLine("  </style>");
-        builder.AppendLine("</head>");
-        builder.AppendLine("<body>");
-        builder.AppendLine("  <main>");
-        builder.AppendLine(Indent(htmlFragment, "    "));
-        builder.AppendLine("  </main>");
-        builder.Append("  <footer><p class=\"app-meta\">Generated with md2html by ")
-            .Append(encodedCompanyName)
-            .Append(" · <a href=\"")
-            .Append(encodedCompanyWebsite)
-            .AppendLine("\">abra.is</a></p></footer>");
-        builder.AppendLine("</body>");
-        builder.AppendLine("</html>");
+    }
 
-        return builder.ToString();
+    private static void AppendGitHubStyles(StringBuilder builder)
+    {
+        builder.AppendLine("    :root { color-scheme: light; }");
+        builder.AppendLine("    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; font-size: 16px; line-height: 1.5; word-wrap: break-word; color: #1f2328; margin: 0 auto; max-width: 1012px; padding: 32px; }");
+        builder.AppendLine("    h1, h2, h3, h4, h5, h6 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; }");
+        builder.AppendLine("    h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid #d1d9e0b3; }");
+        builder.AppendLine("    h2 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid #d1d9e0b3; }");
+        builder.AppendLine("    h3 { font-size: 1.25em; }");
+        builder.AppendLine("    h4 { font-size: 1em; }");
+        builder.AppendLine("    h5 { font-size: 0.875em; }");
+        builder.AppendLine("    h6 { font-size: 0.85em; color: #59636e; }");
+        builder.AppendLine("    p { margin-top: 0; margin-bottom: 16px; }");
+        builder.AppendLine("    a { color: #0969da; text-decoration: none; }");
+        builder.AppendLine("    a:hover { text-decoration: underline; }");
+        builder.AppendLine("    strong { font-weight: 600; }");
+        builder.AppendLine("    pre { background: #f6f8fa; border-radius: 6px; font-size: 85%; line-height: 1.45; overflow: auto; padding: 16px; margin-bottom: 16px; }");
+        builder.AppendLine("    code { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; font-size: 85%; }");
+        builder.AppendLine("    :not(pre) > code { background: #eff1f3; padding: 0.2em 0.4em; border-radius: 6px; font-size: 85%; }");
+        builder.AppendLine("    blockquote { border-left: 3px solid #d1d9e0; color: #59636e; margin: 0 0 16px; padding: 0 1em; }");
+        builder.AppendLine("    blockquote > :first-child { margin-top: 0; }");
+        builder.AppendLine("    blockquote > :last-child { margin-bottom: 0; }");
+        builder.AppendLine("    ul, ol { margin-top: 0; margin-bottom: 16px; padding-left: 2em; }");
+        builder.AppendLine("    li + li { margin-top: 0.25em; }");
+        builder.AppendLine("    li > ul, li > ol { margin-top: 0; margin-bottom: 0; }");
+        builder.AppendLine("    .contains-task-list { list-style: none; padding-left: 1.5em; }");
+        builder.AppendLine("    .task-list-item { position: relative; }");
+        builder.AppendLine("    input[type=checkbox] { margin: 0 0.35em 0.25em -1.4em; vertical-align: middle; }");
+        builder.AppendLine("    table { border-collapse: collapse; border-spacing: 0; margin-top: 0; margin-bottom: 16px; width: max-content; max-width: 100%; overflow: auto; display: block; }");
+        builder.AppendLine("    th, td { border: 1px solid #d1d9e0; padding: 6px 13px; }");
+        builder.AppendLine("    th { font-weight: 600; }");
+        builder.AppendLine("    tr { background-color: #fff; border-top: 1px solid #d1d9e0b3; }");
+        builder.AppendLine("    tr:nth-child(2n) { background-color: #f6f8fa; }");
+        builder.AppendLine("    img { max-width: 100%; }");
+        builder.AppendLine("    .tok-keyword { color: #cf222e; font-weight: 600; }");
+        builder.AppendLine("    .tok-string { color: #0a3069; }");
+        builder.AppendLine("    .tok-comment { color: #6e7781; font-style: italic; }");
+        builder.AppendLine("    .tok-number { color: #0550ae; }");
+        builder.AppendLine("    .tok-type { color: #953800; }");
+        builder.AppendLine("    .tok-literal { color: #0550ae; font-weight: 600; }");
+        builder.AppendLine("    .tok-tag { color: #116329; }");
+        builder.AppendLine("    .tok-attr-name { color: #0550ae; }");
+        builder.AppendLine("    .tok-attr-value { color: #0a3069; }");
+        builder.AppendLine("    .tok-property { color: #953800; }");
+        builder.AppendLine("    footer { border-top: 1px solid #d1d9e0; color: #6e7781; font-size: 12px; margin-top: 32px; padding-top: 16px; }");
+        builder.AppendLine("    .app-meta { margin: 0; }");
     }
 
     private static string Indent(string value, string indentation)

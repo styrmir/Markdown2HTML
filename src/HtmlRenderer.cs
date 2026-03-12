@@ -5,7 +5,7 @@ namespace Markdown2Html;
 
 public static class HtmlRenderer
 {
-    public static string Render(MarkdownDocument document)
+    public static string Render(MarkdownDocument document, bool gitHubStyle = false)
     {
         var builder = new StringBuilder();
 
@@ -16,13 +16,13 @@ public static class HtmlRenderer
                 builder.AppendLine();
             }
 
-            RenderBlock(builder, document.Blocks[index]);
+            RenderBlock(builder, document.Blocks[index], gitHubStyle);
         }
 
         return builder.ToString();
     }
 
-    private static void RenderBlock(StringBuilder builder, BlockNode block)
+    private static void RenderBlock(StringBuilder builder, BlockNode block, bool gitHubStyle)
     {
         switch (block)
         {
@@ -55,10 +55,19 @@ public static class HtmlRenderer
                 break;
 
             case ListBlock list:
-                builder.Append(list.Ordered ? "<ol>" : "<ul>");
+                var isTaskList = gitHubStyle && list.Items.Any(static item => item.IsChecked is not null);
+                if (list.Ordered)
+                {
+                    builder.Append("<ol>");
+                }
+                else
+                {
+                    builder.Append(isTaskList ? "<ul class=\"contains-task-list\">" : "<ul>");
+                }
+
                 foreach (var item in list.Items)
                 {
-                    builder.Append("<li>");
+                    builder.Append(isTaskList && item.IsChecked is not null ? "<li class=\"task-list-item\">" : "<li>");
                     if (item.IsChecked is not null)
                     {
                         builder.Append("<input type=\"checkbox\" disabled");
@@ -78,7 +87,7 @@ public static class HtmlRenderer
 
                     foreach (var child in item.Children)
                     {
-                        RenderBlock(builder, child);
+                        RenderBlock(builder, child, gitHubStyle);
                     }
 
                     builder.Append("</li>");
@@ -96,7 +105,7 @@ public static class HtmlRenderer
                         builder.AppendLine();
                     }
 
-                    RenderBlock(builder, quote.Blocks[index]);
+                    RenderBlock(builder, quote.Blocks[index], gitHubStyle);
                 }
 
                 builder.Append("</blockquote>");
