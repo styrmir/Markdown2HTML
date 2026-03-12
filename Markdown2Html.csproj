@@ -10,7 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>markdown2html</ToolCommandName>
     <PackageId>Markdown2Html</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageOutputPath>nupkg</PackageOutputPath>
     <Description>Command-line Markdown to HTML converter built with .NET 10.</Description>

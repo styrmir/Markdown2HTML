@@ -72,9 +72,23 @@ For a local, repo-scoped install during development:
 
 ```powershell
 dotnet pack
-dotnet tool install --tool-path .\.tool-test --add-source .\nupkg Markdown2Html --version 1.0.0
+dotnet tool install --tool-path .\.tool-test --add-source .\nupkg Markdown2Html --version 1.0.1
 .\.tool-test\markdown2html --help
 ```
+
+## Releases
+
+Prebuilt standalone binaries are available from the GitHub Releases page:
+
+- https://github.com/styrmir/Markdown2HTML/releases
+
+Each release can include platform-specific zip files such as:
+
+- Windows x64
+- Windows ARM64
+- Linux x64
+- macOS x64
+- macOS ARM64
 
 ## Standalone AOT Publish
 
@@ -84,6 +98,24 @@ One-off example for Windows x64:
 
 ```powershell
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishAot=true -p:PublishSingleFile=true -o .\publish\win-x64
+```
+
+One-off example for Linux x64:
+
+```bash
+dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishAot=true -p:PublishSingleFile=true -o ./publish/linux-x64
+```
+
+One-off example for macOS Intel:
+
+```bash
+dotnet publish -c Release -r osx-x64 --self-contained true -p:PublishAot=true -p:PublishSingleFile=true -o ./publish/osx-x64
+```
+
+One-off example for macOS Apple Silicon:
+
+```bash
+dotnet publish -c Release -r osx-arm64 --self-contained true -p:PublishAot=true -p:PublishSingleFile=true -o ./publish/osx-arm64
 ```
 
 The default publish output should go into the `publish` directory.
@@ -112,6 +144,19 @@ Notes:
 - Native AOT cross-OS publishing is host-dependent. The script skips targets that are not expected to build on the current OS.
 - Output is written to `publish/<rid>`.
 - The publish script removes `.pdb` files so the release output contains the deployable binaries only.
+
+### Automated GitHub Releases
+
+The repository includes a GitHub Actions workflow that builds release binaries and attaches them to GitHub Releases when a version tag such as `v1.0.1` is pushed.
+
+Workflow behavior:
+
+- Windows runner builds `win-x64` and `win-arm64`
+- Linux runner builds `linux-x64`
+- macOS Intel runner builds `osx-x64`
+- macOS Apple Silicon runner builds `osx-arm64`
+
+This makes the binaries directly downloadable from the Releases page without building locally.
 
 ## Supported Markdown
 
