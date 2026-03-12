@@ -47,9 +47,11 @@ public static class HtmlRenderer
                         .Append("\"");
                 }
 
-                builder.Append('>')
-                    .Append(HtmlEncoder.Default.Encode(codeBlock.Code))
-                    .Append("</code></pre>");
+                builder.Append('>');
+
+                var highlightedCode = SyntaxHighlighter.HighlightCode(codeBlock.Code, codeBlock.Language);
+                builder.Append(highlightedCode ?? HtmlEncoder.Default.Encode(codeBlock.Code));
+                builder.Append("</code></pre>");
                 break;
 
             case ListBlock list:

@@ -276,7 +276,7 @@ public sealed class AppTests
             - second
 
             ```csharp
-            Console.WriteLine(42);
+            public static string Name = "Sample";
             ```
             """;
 
@@ -285,7 +285,49 @@ public sealed class AppTests
 
         Assert.Contains("<blockquote><p>Quoted <em>text</em></p></blockquote>", html);
         Assert.Contains("<ul><li>first</li><li>second</li></ul>", html);
-        Assert.Contains("<pre><code class=\"language-csharp\">Console.WriteLine(42);</code></pre>", html);
+        Assert.Contains("<pre><code class=\"language-csharp\">", html);
+        Assert.Contains("<span class=\"tok-keyword\">public</span>", html);
+        Assert.Contains("<span class=\"tok-type\">string</span>", html);
+        Assert.Contains("<span class=\"tok-string\">&quot;Sample&quot;</span>", html);
+    }
+
+    [Fact]
+    public void Render_HighlightsHtmlAndJsonCodeBlocks()
+    {
+        const string markdown = """
+            ```html
+            <div class="note">Hello</div>
+            ```
+
+            ```json
+            { "name": "md2html", "enabled": true }
+            ```
+            """;
+
+        var document = MarkdownParser.Parse(markdown);
+        var html = HtmlRenderer.Render(document);
+
+        Assert.Contains("<span class=\"tok-tag\">div</span>", html);
+        Assert.Contains("<span class=\"tok-attr-name\">class</span>", html);
+        Assert.Contains("<span class=\"tok-attr-value\">&quot;note&quot;</span>", html);
+        Assert.Contains("<span class=\"tok-property\">&quot;name&quot;</span>", html);
+        Assert.Contains("<span class=\"tok-literal\">true</span>", html);
+    }
+
+    [Fact]
+    public void Render_FallsBackToPlainCodeForUnsupportedLanguages()
+    {
+        const string markdown = """
+            ```brainfuck
+            ++>---.
+            ```
+            """;
+
+        var document = MarkdownParser.Parse(markdown);
+        var html = HtmlRenderer.Render(document);
+
+        Assert.Contains("<pre><code class=\"language-brainfuck\">&#x2B;&#x2B;&gt;---.</code></pre>", html);
+        Assert.DoesNotContain("tok-keyword", html);
     }
 
     [Fact]

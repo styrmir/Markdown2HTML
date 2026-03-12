@@ -8,6 +8,7 @@ The project currently includes:
 - file output and stdout support
 - a custom markdown parser and HTML renderer
 - HTML document generation with basic built-in styling
+- basic syntax highlighting for common fenced code block languages in generated HTML
 - company branding in help output and generated HTML documents
 - packaging as a .NET tool with the command name `md2html`
 - automated tests for CLI behavior and rendering output
@@ -185,6 +186,7 @@ This makes the binaries available either as workflow artifacts for normal pushes
 - ATX headings using `#` through `######`
 - Paragraphs
 - Fenced code blocks using triple backticks
+- Basic syntax highlighting for fenced code blocks tagged as `csharp`, `javascript`, `typescript`, `python`, `powershell`, `bash`, `json`, `html`, or `xml`
 - Unordered lists using `-`, `*`, or `+`
 - Ordered lists using `1.` style markers
 - Nested lists using indentation
@@ -237,6 +239,7 @@ The app generates a complete HTML document, not only a fragment. The markdown ab
 - The document title is derived from the input file name when a file path is provided
 - When reading from stdin, the default title is `Document`
 - The generated HTML includes a small footer at the bottom with the company name and website
+- Supported fenced code blocks get basic built-in syntax highlighting in the generated HTML
 - Plain text and code content are HTML-escaped
 - Unsafe `javascript:` links are rewritten to `#`
 
