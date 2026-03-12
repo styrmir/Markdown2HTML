@@ -6,5 +6,7 @@ public sealed class CliOptions
 
     public string? OutputPath { get; init; }
 
+    public bool OpenWhenDone { get; init; }
+
     public bool ShowHelp { get; init; }
 }

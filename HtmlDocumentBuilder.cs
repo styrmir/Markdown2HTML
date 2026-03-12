@@ -8,6 +8,8 @@ public static class HtmlDocumentBuilder
     public static string Build(string title, string htmlFragment)
     {
         var encodedTitle = HtmlEncoder.Default.Encode(title);
+        var encodedCompanyName = HtmlEncoder.Default.Encode(AppInfo.CompanyName);
+        var encodedCompanyWebsite = HtmlEncoder.Default.Encode(AppInfo.CompanyWebsite);
         var builder = new StringBuilder();
 
         builder.AppendLine("<!doctype html>");
@@ -26,10 +28,17 @@ public static class HtmlDocumentBuilder
         builder.AppendLine("    th, td { border: 1px solid #d0d7de; padding: 0.6rem 0.75rem; vertical-align: top; }");
         builder.AppendLine("    th { background: #f6f8fa; } ");
         builder.AppendLine("    input[type=checkbox] { margin-right: 0.45rem; }");
+        builder.AppendLine("    header { border-bottom: 1px solid #d0d7de; margin-bottom: 2rem; padding-bottom: 1rem; }");
+        builder.AppendLine("    .app-meta { color: #57606a; font-size: 0.95rem; margin: 0; }");
         builder.AppendLine("    a { color: #0969da; }");
         builder.AppendLine("  </style>");
         builder.AppendLine("</head>");
         builder.AppendLine("<body>");
+        builder.Append("  <header><p class=\"app-meta\">Generated with Markdown2Html by ")
+            .Append(encodedCompanyName)
+            .Append(" · <a href=\"")
+            .Append(encodedCompanyWebsite)
+            .AppendLine("\">abra.is</a></p></header>");
         builder.AppendLine("  <main>");
         builder.AppendLine(Indent(htmlFragment, "    "));
         builder.AppendLine("  </main>");

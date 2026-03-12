@@ -29,6 +29,11 @@ public sealed class AppTests
             Assert.Contains("<title>markdown2html-", standardOutput.ToString(), StringComparison.OrdinalIgnoreCase);
             Assert.Contains("<h1>Sample Title</h1>", standardOutput.ToString());
             Assert.Contains("<p>Paragraph with <strong>bold</strong> text.</p>", standardOutput.ToString());
+            Assert.Contains(AppInfo.CompanyName, standardOutput.ToString());
+            Assert.Contains(AppInfo.CompanyWebsite, standardOutput.ToString());
+            Assert.True(
+                standardOutput.ToString().IndexOf(AppInfo.CompanyName, StringComparison.Ordinal)
+                < standardOutput.ToString().IndexOf("<main>", StringComparison.Ordinal));
         }
         finally
         {
@@ -56,6 +61,47 @@ public sealed class AppTests
     }
 
     [Fact]
+    public async Task RunAsync_WithOpenAndOutput_InvokesOpenAction()
+    {
+        var inputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-input-{Guid.NewGuid():N}.md");
+        var outputFile = Path.Combine(Path.GetTempPath(), $"markdown2html-output-{Guid.NewGuid():N}.html");
+        string? openedPath = null;
+
+        await File.WriteAllTextAsync(inputFile, "# Open Test");
+
+        try
+        {
+            var exitCode = await App.RunAsync(
+                ["--input", inputFile, "--output", outputFile, "--open"],
+                new StringReader(string.Empty),
+                new StringWriter(),
+                new StringWriter(),
+                isInputRedirected: false,
+                openOutputAction: path =>
+                {
+                    openedPath = path;
+                    return Task.CompletedTask;
+                });
+
+            Assert.Equal(0, exitCode);
+            Assert.Equal(outputFile, openedPath);
+            Assert.True(File.Exists(outputFile));
+        }
+        finally
+        {
+            if (File.Exists(inputFile))
+            {
+                File.Delete(inputFile);
+            }
+
+            if (File.Exists(outputFile))
+            {
+                File.Delete(outputFile);
+            }
+        }
+    }
+
+    [Fact]
     public async Task RunAsync_ReturnsErrorForUnknownOption()
     {
         var standardOutput = new StringWriter();
@@ -72,6 +118,65 @@ public sealed class AppTests
         Assert.Equal(string.Empty, standardOutput.ToString());
         Assert.Contains("Unknown option: --unknown", standardError.ToString());
         Assert.Contains("Usage:", standardError.ToString());
+    }
+
+    [Fact]
+    public async Task RunAsync_HelpIncludesCompanyInformation()
+    {
+        var standardOutput = new StringWriter();
+        var standardError = new StringWriter();
+
+        var exitCode = await App.RunAsync(
+            ["--help"],
+            new StringReader(string.Empty),
+            standardOutput,
+            standardError,
+            isInputRedirected: false);
+
+        Assert.Equal(0, exitCode);
+        Assert.Equal(string.Empty, standardError.ToString());
+        Assert.Contains(AppInfo.CompanyName, standardOutput.ToString());
+        Assert.Contains(AppInfo.CompanyWebsite, standardOutput.ToString());
+    }
+
+    [Fact]
+    public async Task RunAsync_WithoutParameters_ShowsNoInputMessageAndBrandedHelp()
+    {
+        var standardOutput = new StringWriter();
+        var standardError = new StringWriter();
+
+        var exitCode = await App.RunAsync(
+            [],
+            new StringReader(string.Empty),
+            standardOutput,
+            standardError,
+            isInputRedirected: false);
+
+        Assert.Equal(1, exitCode);
+        Assert.Equal(string.Empty, standardOutput.ToString());
+        Assert.Contains("No input was provided. Use --input <file> or pipe markdown through stdin.", standardError.ToString());
+        Assert.Contains("Markdown2Html", standardError.ToString());
+        Assert.Contains(AppInfo.CompanyName, standardError.ToString());
+        Assert.Contains(AppInfo.CompanyWebsite, standardError.ToString());
+    }
+
+    [Fact]
+    public async Task RunAsync_WithOpenWithoutOutput_ShowsErrorAndHelp()
+    {
+        var standardOutput = new StringWriter();
+        var standardError = new StringWriter();
+
+        var exitCode = await App.RunAsync(
+            ["--open"],
+            new StringReader(string.Empty),
+            standardOutput,
+            standardError,
+            isInputRedirected: false);
+
+        Assert.Equal(1, exitCode);
+        Assert.Equal(string.Empty, standardOutput.ToString());
+        Assert.Contains("The --open option requires --output <file>.", standardError.ToString());
+        Assert.Contains("Markdown2Html", standardError.ToString());
     }
 
     [Fact]
